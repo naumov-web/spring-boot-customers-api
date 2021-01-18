@@ -31,12 +31,12 @@ public class BaseModel {
     private Long id;
 
     @CreatedDate
-    @Column(name = "createdAt")
-    private Date createdAt;
+    @Column(name = "created_at")
+    private Date created_at;
 
     @LastModifiedDate
-    @Column(name = "updatedAt")
-    private Date updatedAt;
+    @Column(name = "updated_at")
+    private Date updated_at;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "status")

@@ -21,4 +21,6 @@ public class Role extends BaseModel {
     @Column(name = "name")
     private String name;
 
+    public Role(){}
+
 }
