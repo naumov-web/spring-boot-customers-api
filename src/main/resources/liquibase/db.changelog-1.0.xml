@@ -21,10 +21,10 @@
             <column name="surname" type="VARCHAR(255)">
                 <constraints nullable="true"/>
             </column>
-            <column name="createdAt" type="TIMESTAMP" defaultValue="CURRENT_TIMESTAMP()">
+            <column name="created_at" type="TIMESTAMP" defaultValue="CURRENT_TIMESTAMP()">
                 <constraints nullable="false"/>
             </column>
-            <column name="updatedAt" type="TIMESTAMP" defaultValue="CURRENT_TIMESTAMP()">
+            <column name="updated_at" type="TIMESTAMP" defaultValue="CURRENT_TIMESTAMP()">
                 <constraints nullable="false"/>
             </column>
             <column name="status" type="VARCHAR(25)" defaultValue="ACTIVE">
@@ -44,10 +44,10 @@
             <column name="name" type="VARCHAR(100)">
                 <constraints nullable="false" unique="true"/>
             </column>
-            <column name="createdAt" type="TIMESTAMP" defaultValue="CURRENT_TIMESTAMP()">
+            <column name="created_at" type="TIMESTAMP" defaultValue="CURRENT_TIMESTAMP()">
                 <constraints nullable="false"/>
             </column>
-            <column name="updatedAt" type="TIMESTAMP" defaultValue="CURRENT_TIMESTAMP()">
+            <column name="updated_at" type="TIMESTAMP" defaultValue="CURRENT_TIMESTAMP()">
                 <constraints nullable="false"/>
             </column>
             <column name="status" type="VARCHAR(25)" defaultValue="ACTIVE">
