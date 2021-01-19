@@ -3,11 +3,16 @@ package ru.naumovweb.customersapi.rest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import ru.naumovweb.customersapi.dto.requests.LoginDTO;
 import ru.naumovweb.customersapi.dto.requests.RegisterDTO;
 import ru.naumovweb.customersapi.models.User;
 import ru.naumovweb.customersapi.security.jwt.JwtTokenProvider;
@@ -26,7 +31,7 @@ import java.util.Map;
 
 @RestController
 @RequestMapping(value = "/api/v1/auth/")
-public class AuthRestControllerV1 {
+public class AuthRestControllerV1 extends BaseRestController {
 
     private final AuthenticationManager authenticationManager;
 
@@ -45,13 +50,7 @@ public class AuthRestControllerV1 {
     public ResponseEntity register(@Valid @RequestBody final RegisterDTO requestDto, final BindingResult binding) {
 
         if (binding.hasErrors()) {
-            Map<Object, Object> response = new HashMap<>();
-
-            binding.getFieldErrors().forEach(fieldError -> {
-                response.put(fieldError.getField(), fieldError.getDefaultMessage());
-            });
-
-            return ResponseEntity.badRequest().body(response);
+            return ResponseEntity.badRequest().body(mapBindingToResource(binding));
         }
 
         User user = new User();
@@ -63,9 +62,37 @@ public class AuthRestControllerV1 {
         String token = jwtTokenProvider.createToken(registeredUser.getEmail(), registeredUser.getRoles());
 
         Map<Object, Object> response = new HashMap<>();
-        response.put("email", requestDto.getEmail());
+        response.put("email", registeredUser.getEmail());
         response.put("token", token);
 
         return ResponseEntity.ok(response);
+    }
+
+    @PostMapping("login")
+    public ResponseEntity login(@Valid @RequestBody final LoginDTO requestDto, final BindingResult binding) {
+
+        if (binding.hasErrors()) {
+            return ResponseEntity.badRequest().body(mapBindingToResource(binding));
+        }
+        try {
+            String email = requestDto.getEmail();
+            authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(email, requestDto.getPassword()));
+            User user = userService.findByEmail(email);
+
+            if (user == null) {
+                throw new UsernameNotFoundException("User with email: " + email + " not found");
+            }
+
+            String token = jwtTokenProvider.createToken(user.getEmail(), user.getRoles());
+
+            Map<Object, Object> response = new HashMap<>();
+            response.put("id", user.getId());
+            response.put("email", user.getEmail());
+            response.put("token", token);
+
+            return ResponseEntity.ok(response);
+        } catch (AuthenticationException e) {
+            throw new BadCredentialsException("Invalid username or password");
+        }
     }
 }
