@@ -9,6 +9,7 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import ru.naumovweb.customersapi.dto.common.ListItemsDTO;
 import ru.naumovweb.customersapi.dto.requests.CreateCustomerDTO;
+import ru.naumovweb.customersapi.dto.requests.UpdateCustomerDTO;
 import ru.naumovweb.customersapi.dto.resources.CustomerDTO;
 import ru.naumovweb.customersapi.enums.ResponseStatusCodesEnum;
 import ru.naumovweb.customersapi.models.Customer;
@@ -111,5 +112,39 @@ public class CustomerRestController extends BaseRestController {
         customerService.delete(customer.get().getId());
 
         return ResponseEntity.ok(null);
+    }
+
+    @PutMapping(value = "{id}")
+    public ResponseEntity create(
+            @PathVariable(name = "id") Long id,
+            @Valid @RequestBody final UpdateCustomerDTO requestDto,
+            final BindingResult binding
+    ) {
+        if (binding.hasErrors()) {
+            return ResponseEntity.badRequest().body(mapBindingToResource(binding));
+        }
+
+        String email = SecurityContextHolder.getContext().getAuthentication().getName();
+        User user = userService.findByEmail(email);
+
+        Optional<Customer> customer = customerService.findByIdForUser(user, id);
+
+        if (!customer.isPresent()) {
+            return ResponseEntity.status(ResponseStatusCodesEnum.NOT_FOUND).body(null);
+        }
+
+        Customer updatedCustomer = customerService.update(
+                customer.get(),
+                requestDto.getName(),
+                requestDto.getDescription()
+        );
+
+        Map<Object, Object> response = new HashMap<>();
+        response.put("id", updatedCustomer.getId());
+        response.put("name", updatedCustomer.getName());
+        response.put("description", updatedCustomer.getDescription());
+        response.put("status", updatedCustomer.getStatus());
+
+        return ResponseEntity.ok(response);
     }
 }

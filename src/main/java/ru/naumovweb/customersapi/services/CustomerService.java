@@ -15,12 +15,14 @@ import java.util.Optional;
 
 public interface CustomerService {
 
-    public Customer createForUser(User user, Customer customer);
+    Customer createForUser(User user, Customer customer);
 
-    public ListItemsDTO<Customer> indexForUser(User user, Integer size, Integer pageNumber, String sortBy, String sortDirection);
+    ListItemsDTO<Customer> indexForUser(User user, Integer size, Integer pageNumber, String sortBy, String sortDirection);
 
-    public Optional<Customer> findByIdForUser(User user, Long id);
+    Optional<Customer> findByIdForUser(User user, Long id);
 
-    public void delete(Long id);
+    void delete(Long id);
+
+    Customer update(Customer customer, String name, String description);
 
 }
