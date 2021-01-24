@@ -4,10 +4,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+import ru.naumovweb.customersapi.dto.common.ListItemsDTO;
 import ru.naumovweb.customersapi.dto.requests.CreateCustomerDTO;
 import ru.naumovweb.customersapi.models.Customer;
 import ru.naumovweb.customersapi.models.User;
@@ -60,6 +58,29 @@ public class CustomerRestController extends BaseRestController {
         response.put("description", newCustomer.getDescription());
         response.put("status", newCustomer.getStatus());
 
+        return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("")
+    public ResponseEntity index(
+            @RequestParam(name = "size", required = false) Integer size,
+            @RequestParam(name = "pageNumber", required = false) Integer pageNumber,
+            @RequestParam(name = "sortBy", required = false) String sortBy,
+            @RequestParam(name = "sortDirection", required = false) String sortDirection
+    ) {
+        String email = SecurityContextHolder.getContext().getAuthentication().getName();
+        User user = userService.findByEmail(email);
+
+        ListItemsDTO<Customer> itemsDTO = customerService.indexForUser(
+                user,
+                size,
+                pageNumber,
+                sortBy,
+                sortDirection
+        );
+
+        Map<Object, Object> response = new HashMap<>();
+        response.put("pagesCount", itemsDTO.getPagesCount());
         return ResponseEntity.ok(response);
     }
 }
