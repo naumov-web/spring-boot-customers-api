@@ -38,7 +38,7 @@ public class CustomerRepositoryImpl implements CustomerRepository {
         if (sortBy != null && sortDirection != null) {
             sort = Sort.by(sortBy);
             if (sortDirection.equals("desc")) {
-                sort.descending();
+                sort = sort.descending();
             }
         }
 
