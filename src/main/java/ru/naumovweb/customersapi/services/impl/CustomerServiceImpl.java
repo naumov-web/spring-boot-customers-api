@@ -9,6 +9,8 @@ import ru.naumovweb.customersapi.models.User;
 import ru.naumovweb.customersapi.repositories.CustomerRepository;
 import ru.naumovweb.customersapi.services.CustomerService;
 
+import java.util.Optional;
+
 @Service
 public class CustomerServiceImpl implements CustomerService {
 
@@ -29,5 +31,15 @@ public class CustomerServiceImpl implements CustomerService {
     @Override
     public ListItemsDTO<Customer> indexForUser(User user, Integer limit, Integer offset, String sortBy, String sortDirection) {
         return customerRepository.indexForUser(user, limit, offset, sortBy, sortDirection);
+    }
+
+    @Override
+    public Optional<Customer> findByIdForUser(User user, Long id) {
+        return customerRepository.findByIdForUser(user, id);
+    }
+
+    @Override
+    public void delete(Long id) {
+        customerRepository.delete(id);
     }
 }

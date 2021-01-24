@@ -12,4 +12,13 @@ public class CustomerSpecifications {
         };
     }
 
+    public static Specification<Customer> filterByUserAndId(User user, Long id) {
+        return (root, query, cb) -> {
+            return cb.and(
+                    cb.equal(root.<String>get("user"), user),
+                    cb.equal(root.<String>get("id"), id)
+            );
+        };
+    }
+
 }
