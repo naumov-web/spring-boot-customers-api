@@ -1,6 +1,7 @@
 package ru.naumovweb.customersapi.rest;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -9,16 +10,14 @@ import org.springframework.web.bind.annotation.*;
 import ru.naumovweb.customersapi.dto.common.ListItemsDTO;
 import ru.naumovweb.customersapi.dto.requests.CreateCustomerDTO;
 import ru.naumovweb.customersapi.dto.resources.CustomerDTO;
+import ru.naumovweb.customersapi.enums.ResponseStatusCodesEnum;
 import ru.naumovweb.customersapi.models.Customer;
 import ru.naumovweb.customersapi.models.User;
 import ru.naumovweb.customersapi.services.CustomerService;
 import ru.naumovweb.customersapi.services.UserService;
 
 import javax.validation.Valid;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * REST controller for customer requests (create, index, update, delete, show)
@@ -96,5 +95,21 @@ public class CustomerRestController extends BaseRestController {
         response.put("items", items);
 
         return ResponseEntity.ok(response);
+    }
+
+    @DeleteMapping("{id}")
+    public ResponseEntity delete(@PathVariable(name = "id") Long id) {
+        String email = SecurityContextHolder.getContext().getAuthentication().getName();
+        User user = userService.findByEmail(email);
+
+        Optional<Customer> customer = customerService.findByIdForUser(user, id);
+
+        if (!customer.isPresent()) {
+            return ResponseEntity.status(ResponseStatusCodesEnum.NOT_FOUND).body(null);
+        }
+
+        customerService.delete(customer.get().getId());
+
+        return ResponseEntity.ok(null);
     }
 }

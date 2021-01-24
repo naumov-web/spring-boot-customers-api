@@ -15,6 +15,8 @@ import ru.naumovweb.customersapi.repositories.CustomerBaseRepository;
 import ru.naumovweb.customersapi.repositories.CustomerRepository;
 import ru.naumovweb.customersapi.repositories.specififactions.CustomerSpecifications;
 
+import java.util.Optional;
+
 @Repository
 public class CustomerRepositoryImpl implements CustomerRepository {
 
@@ -54,5 +56,15 @@ public class CustomerRepositoryImpl implements CustomerRepository {
         dto.setPagesCount(pageDto.getTotalPages());
 
         return dto;
+    }
+
+    @Override
+    public Optional<Customer> findByIdForUser(User user, Long id) {
+        return baseRepository.findOne(CustomerSpecifications.filterByUserAndId(user, id));
+    }
+
+    @Override
+    public void delete(Long id) {
+        baseRepository.deleteById(id);
     }
 }
